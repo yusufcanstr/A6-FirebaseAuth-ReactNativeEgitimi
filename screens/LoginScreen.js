@@ -7,10 +7,21 @@ import {
   TouchableOpacity,
 } from "react-native";
 import React, { useState } from "react";
+import { auth } from "../firebase";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const handlerSignUp = () => {
+    auth
+      .createUserWithEmailAndPassword(email, password)
+      .then((userCredentials) => {
+        const user = userCredentials.user;
+        console.log("Kullanıcı ", user.email);
+      })
+      .catch((error) => alert(error.message));
+  };
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
@@ -33,7 +44,10 @@ export default function LoginScreen() {
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.outlineButton]}>
+        <TouchableOpacity
+          onPress={handlerSignUp}
+          style={[styles.button, styles.outlineButton]}
+        >
           <Text style={styles.outlineButtonText}>Sign Up</Text>
         </TouchableOpacity>
       </View>
