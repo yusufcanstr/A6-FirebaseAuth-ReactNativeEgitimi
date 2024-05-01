@@ -6,12 +6,23 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { auth } from "../firebase";
+import { useNavigation } from "@react-navigation/native";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        navigation.navigate("Home");
+      }
+    });
+  });
 
   const handlerSignUp = () => {
     auth
@@ -19,6 +30,16 @@ export default function LoginScreen() {
       .then((userCredentials) => {
         const user = userCredentials.user;
         console.log("Kullanıcı ", user.email);
+      })
+      .catch((error) => alert(error.message));
+  };
+
+  const handlerLogin = () => {
+    auth
+      .signInWithEmailAndPassword(email, password)
+      .then((userCredentials) => {
+        const user = userCredentials.user;
+        console.log("Giriş Yapan Kullanıcı: ", user.email);
       })
       .catch((error) => alert(error.message));
   };
@@ -41,7 +62,7 @@ export default function LoginScreen() {
         />
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity onPress={handlerLogin} style={styles.button}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
         <TouchableOpacity
